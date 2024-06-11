@@ -1,6 +1,6 @@
-import sqlite3
-import telebot
-from telebot import types
+# import sqlite3
+# import telebot
+# from telebot import types
 from wrapper_bot import TelegramBotWrapper
 from utils import category
 from decouple import config

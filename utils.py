@@ -13,9 +13,9 @@ bot = TelegramBotWrapper(TOKEN)
 
 
 def category(uid, update=None, call=None):
-    """Выаодит список категорий в при запуске , if update is None: обновляет экран"""
+    """Выводит список категорий в при запуске , if update is None: обновляет экран"""
 
-    with sqlite3.connect("SHOP_BOT_2\src\shop_2.db") as connection:
+    with sqlite3.connect("shop_2.db") as connection:
         cursor = connection.cursor()
         cursor.execute(""" SELECT * FROM Category """)
         res = cursor.fetchall()
@@ -48,7 +48,7 @@ def category(uid, update=None, call=None):
 def tovar(cat_num):
     """принимает номер категории и выводит из таблицы товары этой категории"""
 
-    with sqlite3.connect("SHOP_BOT_2\src\shop_2.db") as connection:
+    with sqlite3.connect("shop_2.db") as connection:
         cursor = connection.cursor()
         cursor.execute(
             """ SELECT id,name FROM Product WHERE category_id =?""", (cat_num,)
@@ -58,7 +58,7 @@ def tovar(cat_num):
 
 
 def specific_product(id_tovar):
-    with sqlite3.connect("SHOP_BOT_2\src\shop_2.db") as connection:
+    with sqlite3.connect("shop_2.db") as connection:
         cursor = connection.cursor()
         cursor.execute(""" SELECT * FROM Product WHERE id =?""", (id_tovar,))
         res_info = cursor.fetchall()
@@ -66,7 +66,7 @@ def specific_product(id_tovar):
 
 
 def basket(uid, prod_id=None):
-    with sqlite3.connect("SHOP_BOT_2\src\shop_2.db") as connection:
+    with sqlite3.connect("shop_2.db") as connection:
         cursor = connection.cursor()
         if prod_id is not None:
             cursor.execute(
@@ -189,7 +189,7 @@ def screen_basket(call, end=None):
 
 def add2_basket(uid, prod_id, action):
 
-    with sqlite3.connect("SHOP_BOT_2\src\shop_2.db") as connection:
+    with sqlite3.connect("shop_2.db") as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -239,7 +239,7 @@ def order_and_ordeItem(uid, call):
     date = data_time.strftime("%m.%d.%Y")
     time = data_time.strftime("%H:%M")
 
-    with sqlite3.connect("SHOP_BOT_2\src\shop_2.db") as connection:
+    with sqlite3.connect("shop_2.db") as connection:
         cursor = connection.cursor()
         cursor.execute(
             """ SELECT * FROM Basket WHERE user_id =?""",
@@ -280,7 +280,7 @@ def get_orders(uid, call):
     # res_basket = basket(uid)
     chat_id = call.message.chat.id
     message_id = call.message.message_id
-    with sqlite3.connect("SHOP_BOT_2\src\shop_2.db") as connection:
+    with sqlite3.connect("shop_2.db") as connection:
         cursor = connection.cursor()
         cursor.execute(
             """SELECT  DISTINCT Product.name,count,Orders.user_id,date,time FROM Order_item

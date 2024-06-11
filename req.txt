@@ -1,0 +1,4 @@
+python-decouple
+datetime
+sqlite3
+telebot
