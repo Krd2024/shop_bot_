@@ -2,3 +2,5 @@ python-decouple
 datetime
 pyTelegramBotAPI 
 telebot
+aiosqlite
+asyncio

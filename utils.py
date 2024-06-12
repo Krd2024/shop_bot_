@@ -5,6 +5,12 @@ from telebot import types
 from wrapper_bot import TelegramBotWrapper
 import time
 
+# ----------------------------------------------------------------
+import aiosqlite
+import asyncio
+import logging
+from telebot import AsyncTeleBot
+
 from decouple import config
 
 TOKEN = config("TOKEN", cast=str, default="пусто")
@@ -66,6 +72,8 @@ def specific_product(id_tovar):
 
 
 def basket(uid, prod_id=None):
+    """Возвращает количество товара в корзине"""
+
     with sqlite3.connect("shop_2.db") as connection:
         cursor = connection.cursor()
         if prod_id is not None:
@@ -112,7 +120,30 @@ def product(res, call):
     )
 
 
+# =================================================================
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler("app.log")
+file_handler.setLevel(logging.INFO)
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+# =================================================================
+
+
 def choice_product(call, prod_id, res_info=None):
+    """выбор кол-ва"""
+
     uid = call.from_user.id
     chat_id = call.message.chat.id
     message_id = call.message.message_id
@@ -141,7 +172,9 @@ def choice_product(call, prod_id, res_info=None):
 
     add = [key2, key1]
     add1 = [key3]
+
     keyboard = types.InlineKeyboardMarkup([add, add1, [key_back_2]])
+
     try:
         bot.edit_message_text(
             chat_id=chat_id,
@@ -188,49 +221,60 @@ def screen_basket(call, end=None):
 
 
 def add2_basket(uid, prod_id, action):
+    """добавить в карзину выбранный товар"""
 
     with sqlite3.connect("shop_2.db") as connection:
-        cursor = connection.cursor()
+        try:
+            cursor = connection.cursor()
 
-        cursor.execute(
-            """ SELECT * FROM Basket WHERE user_id =? AND product_id=?""",
-            (
-                uid,
-                prod_id,
-            ),
-        )
-        info_basket = cursor.fetchall()
-
-        # print(info_basket)
-        if info_basket == []:
-            if action == "pls":
-                cursor.execute(
-                    """INSERT INTO Basket (product_id,qty,user_id) VALUES (?,?,?)""",
-                    (
-                        prod_id,
-                        1,
-                        uid,
-                    ),
-                )
-            elif action == "min":
-                print("Нечего отнимать")
-        else:
-            qty = info_basket[0][1]
-            if action == "pls":
-                qty += 1
-            else:
-                qty -= 1
             cursor.execute(
-                """UPDATE Basket SET product_id=?,qty=?,user_id=? WHERE user_id=? AND product_id=? """,
+                """ SELECT * FROM Basket WHERE user_id =? AND product_id=?""",
                 (
-                    prod_id,
-                    qty,
-                    uid,
                     uid,
                     prod_id,
                 ),
             )
-        connection.commit()
+            info_basket = cursor.fetchall()
+
+            # print(info_basket)
+            if info_basket == []:
+                if action == "pls":
+                    cursor.execute(
+                        """INSERT INTO Basket (product_id,qty,user_id) VALUES (?,?,?)""",
+                        (
+                            prod_id,
+                            1,
+                            uid,
+                        ),
+                    )
+
+                elif action == "min":
+                    print("Нечего отнимать")
+            else:
+                qty = info_basket[0][1]
+                if action == "pls":
+                    qty += 1
+                else:
+                    qty -= 1
+                cursor.execute(
+                    """UPDATE Basket SET product_id=?,qty=?,user_id=? WHERE user_id=? AND product_id=? """,
+                    (
+                        prod_id,
+                        qty,
+                        uid,
+                        uid,
+                        prod_id,
+                    ),
+                )
+
+            connection.commit()
+            logging.info(f"Item {prod_id} added to cart for user {uid}")
+        except sqlite3.Error as e:
+            logging.error(f"SQLite error: {e}")
+        except Exception as e:
+            logging.error(f"Error adding item to cart: {e}")
+        finally:
+            ...
 
 
 def order_and_ordeItem(uid, call):
