@@ -6,10 +6,9 @@ from wrapper_bot import TelegramBotWrapper
 import time
 
 # ----------------------------------------------------------------
-import aiosqlite
-import asyncio
+
 import logging
-from telebot import AsyncTeleBot
+
 
 from decouple import config
 
