@@ -1,19 +1,17 @@
 import datetime
 import sqlite3
-import telebot
+
+# import telebot
 from telebot import types
 from wrapper_bot import TelegramBotWrapper
-import time
+
+# import time
 
 # ----------------------------------------------------------------
-
 import logging
-
-
 from decouple import config
 
 TOKEN = config("TOKEN", cast=str, default="пусто")
-
 bot = TelegramBotWrapper(TOKEN)
 
 

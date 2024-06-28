@@ -1,10 +1,9 @@
-from telebot import types
+# from telebot import types
 from wrapper_bot import TelegramBotWrapper
 from utils import *
-
 from decouple import config
 
-from utils import category
+# from utils import category
 
 TOKEN = config("TOKEN", cast=str, default="пусто")
 bot = TelegramBotWrapper(TOKEN)
