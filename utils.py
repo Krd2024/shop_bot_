@@ -18,10 +18,17 @@ bot = TelegramBotWrapper(TOKEN)
 def category(uid, update=None, call=None):
     """Выводит список категорий в при запуске , if update is None: обновляет экран"""
 
+    # =================================================================
+
+    # =================================================================
+
     with sqlite3.connect("shop_2.db") as connection:
         cursor = connection.cursor()
         cursor.execute(""" SELECT * FROM Category """)
         res = cursor.fetchall()
+
+    wa = types.WebAppInfo("https://www.annrus23.ru")
+    key0 = types.InlineKeyboardButton(f"РУССКИЙ ЯЗЫК", web_app=wa)
 
     key1 = types.InlineKeyboardButton(f"{res[0][1]}", callback_data=f"kateg{res[0][0]}")
     key2 = types.InlineKeyboardButton(f"{res[1][1]}", callback_data=f"kateg{res[1][0]}")
@@ -34,7 +41,9 @@ def category(uid, update=None, call=None):
 
     add = [key1, key2]
     add1 = [key3, key4]
-    keyboard = types.InlineKeyboardMarkup([add, add1, [get_orders], [key_basket]])
+    keyboard = types.InlineKeyboardMarkup(
+        [add, add1, [get_orders], [key_basket], [key0]]
+    )
     if update is None:
         bot.send_message(uid, text="Выберите категорию товаров:", reply_markup=keyboard)
     else:
